@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Cherry Programa</title>
+</head>
+<body>
+    <h1>Elimina fekas</h1>
+
+    <button id="selectFile1" onclick="document.getElementById('file1').click();">
+        Selecciona tus seguidos
+    </button>
+    <input type="file" id="file1" accept=".json" style="display: none;">
+
+    <button id="selectFile2" onclick="document.getElementById('file2').click();">
+        Selecciona tus seguidores
+    </button>
+    <input type="file" id="file2" accept=".json" style="display: none;">
+
+    <button onclick="compareJsonFiles()">Click aqui</button>
+
+    <h3>Fekas:</h3>
+    <pre id="notFollowingBack"></pre>
+
+    <script>
+        function compareJsonFiles() {
+            const file1 = document.getElementById('file1').files[0];
+            const file2 = document.getElementById('file2').files[0];
+
+            if (file1 && file2) {
+                const reader1 = new FileReader();
+                const reader2 = new FileReader();
+
+                reader1.onload = function(event) {
+                    const json1 = JSON.parse(event.target.result);
+                    reader2.onload = function(event) {
+                        const json2 = JSON.parse(event.target.result);
+
+                        
+                        const following = extractValuesFromFile(json1);
+
+                        
+                        const followers = extractValuesFromFile(json2);
+
+                        if (following && followers) {
+                            
+                            const notFollowingBack = following.filter(followingPerson => !followers.includes(followingPerson));
+
+                            
+                            document.getElementById('notFollowingBack').textContent = JSON.stringify(notFollowingBack, null, 2);
+                        } else {
+                            alert("No se encontraron datos válidos en uno o ambos archivos.");
+                        }
+                    };
+                    reader2.readAsText(file2);
+                };
+                reader1.readAsText(file1);
+            } else {
+                alert('Por favor, selecciona ambos archivos.');
+            }
+        }
+
+        
+        function extractValuesFromFile(json) {
+            let allValues = [];
+
+            if (Array.isArray(json)) {
+                
+                json.forEach(item => {
+                    if (item.string_list_data) {
+                        allValues = allValues.concat(extractValues(item.string_list_data));
+                    }
+                });
+            } else if (json.relationships_following && Array.isArray(json.relationships_following)) {
+                
+                json.relationships_following.forEach(item => {
+                    if (item.string_list_data) {
+                        allValues = allValues.concat(extractValues(item.string_list_data));
+                    }
+                });
+            }
+
+            return allValues.length > 0 ? allValues : null;
+        }
+
+        function extractValues(array) {
+            return array.map(item => item.value);
+        }
+    </script>
+</body>
+</html>

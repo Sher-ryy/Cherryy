@@ -38,17 +38,11 @@
                     reader2.onload = function(event) {
                         const json2 = JSON.parse(event.target.result);
 
-                        
                         const following = extractValuesFromFile(json1);
-
-                        
                         const followers = extractValuesFromFile(json2);
 
                         if (following && followers) {
-                            
                             const notFollowingBack = following.filter(followingPerson => !followers.includes(followingPerson));
-
-                            
                             document.getElementById('notFollowingBack').textContent = JSON.stringify(notFollowingBack, null, 2);
                         } else {
                             alert("No se encontraron datos válidos en uno o ambos archivos.");
@@ -62,33 +56,25 @@
             }
         }
 
-        
         function extractValuesFromFile(json) {
             let allValues = [];
 
-            if (Array.isArray(json)) {
-                
-                json.forEach(item => {
-                    if (item.string_list_data) {
-                        allValues = allValues.concat(extractValues(item.string_list_data));
+            if (json.relationships_following && Array.isArray(json.relationships_following)) {
+                json.relationships_following.forEach(item => {
+                    if (item.title) {
+                        allValues.push(item.title);
                     }
                 });
-            } else if (json.relationships_following && Array.isArray(json.relationships_following)) {
-                
-                json.relationships_following.forEach(item => {
-                    if (item.string_list_data) {
-                        allValues = allValues.concat(extractValues(item.string_list_data));
+            } else if (json.relationships_followers && Array.isArray(json.relationships_followers)) {
+                json.relationships_followers.forEach(item => {
+                    if (item.title) {
+                        allValues.push(item.title);
                     }
                 });
             }
 
             return allValues.length > 0 ? allValues : null;
         }
-
-        function extractValues(array) {
-            return array.map(item => item.value);
-        }
     </script>
 </body>
 </html>
-

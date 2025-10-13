@@ -7,7 +7,7 @@
     <title>Cherry Programa</title>
 </head>
 <body>
-    <h1>Elimina fekas</h1>
+    <h1>Personas que no te siguen de vuelta</h1>
 
     <button id="selectFile1" onclick="document.getElementById('file1').click();">
         Selecciona tus seguidos
@@ -42,7 +42,7 @@
                         const followers = extractValuesFromFile(json2);
 
                         if (following && followers) {
-                            const notFollowingBack = following.filter(followingPerson => !followers.includes(followingPerson));
+                            const notFollowingBack = following.filter(person => !followers.includes(person));
                             document.getElementById('notFollowingBack').textContent = JSON.stringify(notFollowingBack, null, 2);
                         } else {
                             alert("No se encontraron datos válidos en uno o ambos archivos.");
@@ -59,16 +59,23 @@
         function extractValuesFromFile(json) {
             let allValues = [];
 
+            // Caso 1: Archivo de seguidos (relationships_following)
             if (json.relationships_following && Array.isArray(json.relationships_following)) {
                 json.relationships_following.forEach(item => {
                     if (item.title) {
                         allValues.push(item.title);
                     }
                 });
-            } else if (json.relationships_followers && Array.isArray(json.relationships_followers)) {
-                json.relationships_followers.forEach(item => {
-                    if (item.title) {
-                        allValues.push(item.title);
+            } 
+            // Caso 2: Archivo de seguidores (array directo con string_list_data)
+            else if (Array.isArray(json)) {
+                json.forEach(item => {
+                    if (item.string_list_data && Array.isArray(item.string_list_data)) {
+                        item.string_list_data.forEach(sub => {
+                            if (sub.value) {
+                                allValues.push(sub.value);
+                            }
+                        });
                     }
                 });
             }

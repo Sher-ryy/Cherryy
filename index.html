@@ -84,11 +84,11 @@
 
             return allValues.length > 0 ? allValues : null;
         }
-        {
+
         function extractValues(array) {
-    return array.map(item => item.value || item.title || null).filter(Boolean);
-}
+            return array.map(item => item.value);
         }
     </script>
 </body>
 </html>
+

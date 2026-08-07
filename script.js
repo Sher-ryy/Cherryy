@@ -1,4 +1,4 @@
-```javascript
+
 let notFollowingBack = [];
 let filteredUsers = [];
 
